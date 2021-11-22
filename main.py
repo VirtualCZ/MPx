@@ -6,8 +6,6 @@ from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 
-fjkfjfjsdfojsdopjfiopsdjfkokotina
-
 class Window(QWidget):
     def __init__(self):
         super().__init__()
