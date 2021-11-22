@@ -2,12 +2,15 @@ import sys
 import magic
 # pip install python-magic
 # pip install python-magic-bin
+            #doc - https://pypi.org/project/python-magic/
             #na kontrolu zda je soubor video
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QStyle, QSlider, QFileDialog
 from PyQt5.QtGui import QIcon, QPalette
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
+            #doc - https://doc.qt.io/qt-5/multimediaoverview.html
+# pip install PyQt5
 
 class Window(QWidget):
     def __init__(self):
@@ -15,7 +18,6 @@ class Window(QWidget):
         self.setWindowTitle('MPx') #nastavi title
         self.setWindowIcon(QIcon('media-player-5.ico')) #nastavi ikonku
         # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
-        # https://doc.qt.io/qt-5/multimediaoverview.html        <-- dokumentace PyQt5
         self.setGeometry(710, 290, 500, 500) #xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
         self.setMinimumSize(400, 400) # xMinimalniVelikost,
 
@@ -88,9 +90,10 @@ class Window(QWidget):
             self.showMaximized()
             self.mediaPlayer.play()
 
-        mime = magic.Magic(mime=True)
-        filenamecheck = mime.from_file(filename)
-        if filenamecheck.find('video') != -1:
+        mime = magic.Magic(mime=True) #check zda je soubor video
+        videocheck = mime.from_file(filename)
+
+        if videocheck.find('video') != -1:
             print('it is video')
 
     def play_video(self):
