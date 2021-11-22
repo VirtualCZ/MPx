@@ -1,5 +1,8 @@
 import sys
-import cv2 # pip install opencv-python
+import magic
+# pip install python-magic
+# pip install python-magic-bin
+            #na kontrolu zda je soubor video
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QStyle, QSlider, QFileDialog
 from PyQt5.QtGui import QIcon, QPalette
 from PyQt5.QtCore import Qt, QUrl
@@ -28,8 +31,8 @@ class Window(QWidget):
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         videowidget = QVideoWidget()
 
-        self.otevriSouborBtn = QPushButton("Otevrit soubor...")
-        self.otevriSouborBtn.clicked.connect(self.open_file)
+        self.openFileBtn = QPushButton("Otevrit soubor...")
+        self.openFileBtn.clicked.connect(self.open_file)
 
         self.playBtn = QPushButton() #vytvori tlacitko "play"
         self.playBtn.setEnabled(False)
@@ -48,7 +51,7 @@ class Window(QWidget):
 
         hbox =  QHBoxLayout() #umisti tlacitka, slidery,... do UI
         hbox.setContentsMargins(0,0,0,0)
-        hbox.addWidget(self.otevriSouborBtn)
+        hbox.addWidget(self.openFileBtn)
         hbox.addWidget(self.playBtn)
         hbox.addWidget(self.slider)
 
@@ -82,11 +85,13 @@ class Window(QWidget):
         if filename != '':
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(filename)))
             self.playBtn.setEnabled(True)
-            resolution = cv2.VideoCapture(filename)
-            height = resolution.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            width = resolution.get(cv2.CAP_PROP_FRAME_WIDTH)
-            self.setGeometry(710, 290, width, height)
+            self.showMaximized()
             self.mediaPlayer.play()
+
+        mime = magic.Magic(mime=True)
+        filenamecheck = mime.from_file(filename)
+        if filenamecheck.find('video') != -1:
+            print('it is video')
 
     def play_video(self):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
