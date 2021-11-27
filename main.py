@@ -2,15 +2,19 @@ import sys
 import magic
 # pip install python-magic
 # pip install python-magic-bin
+                                #nedokaze prehrat háčky, kroužky ů ú ěščřžýáíé
+                                #fix: replace 214 řádek na              return s.decode('utf-8', errors='replace')      v C:\Users\Virtual\AppData\Local\Programs\Python\Python39\Lib\site-packages\magic\magic.py
             #doc - https://pypi.org/project/python-magic/
             #na kontrolu zda je soubor video
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QStyle, QSlider, QFileDialog
-from PyQt5.QtGui import QIcon, QPalette
+from PyQt5.QtGui import QIcon, QPalette, QColor
 from PyQt5.QtCore import Qt, QUrl
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5.QtMultimediaWidgets import QVideoWidget
             #doc - https://doc.qt.io/qt-5/multimediaoverview.html
 # pip install PyQt5
+
+#opencv mega cool
 
 class Window(QWidget):
     def __init__(self):
@@ -19,10 +23,10 @@ class Window(QWidget):
         self.setWindowIcon(QIcon('media-player-5.ico')) #nastavi ikonku
         # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
         self.setGeometry(710, 290, 500, 500) #xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
-        self.setMinimumSize(400, 400) # xMinimalniVelikost,
+        self.setMinimumSize(400, 400) # xMinimalniVelikost, yMinimalniVelikost
 
         p = self.palette()
-        p.setColor(QPalette.Window, Qt.lightGray) #nastavi barvu okna
+        p.setColor(QPalette.Window, QColor(52, 51, 51)) #nastavi barvu okna
         self.setPalette(p) #aplikuje barvu
 
         self.create_player()
@@ -43,13 +47,12 @@ class Window(QWidget):
 
         self.slider = QSlider(Qt.Horizontal) #vytvori slider
         self.slider.setRange(0,0)
+        self.slider.valueChanged.connect(self.mediaPlayer.setPosition)
 
         self.audioSlider = QSlider(Qt.Horizontal)
-        self.audioSlider.setRange(0,0)
-
-        self.volumeDownBtn = QPushButton('-',clicked=self.volumeDown)
-        self.volumeUpBtn = QPushButton('+', clicked=self.volumeUp)
-
+        self.audioSlider.setMaximum(100)
+        self.audioSlider.setProperty("value", 100)
+        self.audioSlider.valueChanged.connect(self.mediaPlayer.setVolume)
 
         hbox =  QHBoxLayout() #umisti tlacitka, slidery,... do UI
         hbox.setContentsMargins(0,0,0,0)
@@ -58,8 +61,6 @@ class Window(QWidget):
         hbox.addWidget(self.slider)
 
         hbox.addWidget(self.audioSlider)
-        hbox.addWidget(self.volumeDownBtn)
-        hbox.addWidget(self.volumeUpBtn)
 
         vbox = QVBoxLayout()
         vbox.addWidget(videowidget)
@@ -68,18 +69,8 @@ class Window(QWidget):
         self.setLayout(vbox)
 
         self.mediaPlayer.stateChanged.connect(self.mediastate_changed)
-        self.mediaPlayer.positionChanged.connect(self.position_changed)
+        self.mediaPlayer.positionChanged.connect(self.update_position)
         self.mediaPlayer.durationChanged.connect(self.duration_changed)
-
-    def volumeDown(self):
-        currentVolume = self.mediaPlayer.volume()
-        print(currentVolume)
-        self.mediaPlayer.setVolume(currentVolume - 5)
-
-    def volumeUp(self):
-            currentVolume = self.mediaPlayer.volume()
-            print(currentVolume)
-            self.mediaPlayer.setVolume(currentVolume + 5)
 
     def open_file(self):
         filename, _ = QFileDialog.getOpenFileName(self, "Open Video")
@@ -87,7 +78,6 @@ class Window(QWidget):
         if filename != '':
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(filename)))
             self.playBtn.setEnabled(True)
-            self.showMaximized()
             self.mediaPlayer.play()
 
         mime = magic.Magic(mime=True) #check zda je soubor video
@@ -95,6 +85,7 @@ class Window(QWidget):
 
         if videocheck.find('video') != -1:
             print('it is video')
+            self.showMaximized()
 
     def play_video(self):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
@@ -115,6 +106,11 @@ class Window(QWidget):
 
     def duration_changed(self,duration):
         self.slider.setRange(0, duration)
+
+    def update_position(self, position):
+        self.slider.blockSignals(True)
+        self.slider.setValue(position)
+        self.slider.blockSignals(False)
 
 app = QApplication(sys.argv) #vytvori PyQt5 aplikaci
 window = Window()  #vytvori okno
