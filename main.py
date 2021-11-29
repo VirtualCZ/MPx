@@ -1,85 +1,53 @@
 import sys
 import magic
-# pip install python-magic
-# pip install python-magic-bin
-            #doc - https://pypi.org/project/python-magic/
-            #na kontrolu zda je soubor video
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QStyle, QSlider, QFileDialog
-from PyQt5.QtGui import QIcon, QPalette
-from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5.QtMultimediaWidgets import QVideoWidget
-            #doc - https://doc.qt.io/qt-5/multimediaoverview.html
-# pip install PyQt5
+#bude obsahovat menu (File, Edit, About,...), Queue, v menu bude historie
+from PyQt5.QtCore import QUrl
+from PyQt5.QtGui import QPalette, QColor, QIcon
+from PyQt5.QtMultimedia import QMediaContent
+from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog
 
-class Window(QWidget):
+
+class QueueWin(QMainWindow):
     def __init__(self):
-        super().__init__()
-        self.setWindowTitle('MPx') #nastavi title
-        self.setWindowIcon(QIcon('media-player-5.ico')) #nastavi ikonku
-        # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
+        QMainWindow.__init__(self)
+        self.setWindowTitle('MPx')  # nastavi title
+        self.setWindowIcon(QIcon('media-player-5.ico'))  # nastavi ikonku
         self.setGeometry(710, 290, 500, 500) #xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
-        self.setMinimumSize(400, 400) # xMinimalniVelikost,
+        self.setMinimumSize(400, 400) # xMinimalniVelikost, yMinimalniVelikost
 
         p = self.palette()
-        p.setColor(QPalette.Window, Qt.lightGray) #nastavi barvu okna
-        self.setPalette(p) #aplikuje barvu
+        p.setColor(QPalette.Window, QColor(52, 51, 51))  # nastavi barvu okna
+        self.setPalette(p)  # aplikuje barvu
 
-        self.create_player()
-
-        self.show()
-
-    def create_player(self):
-        self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
-        videowidget = QVideoWidget()
-
-        self.openFileBtn = QPushButton("Otevrit soubor...")
-        self.openFileBtn.clicked.connect(self.open_file)
-
-        self.playBtn = QPushButton() #vytvori tlacitko "play"
-        self.playBtn.setEnabled(False)
-        self.playBtn.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
-        self.playBtn.clicked.connect(self.play_video)
-
-        self.slider = QSlider(Qt.Horizontal) #vytvori slider
-        self.slider.setRange(0,0)
-
-        self.audioSlider = QSlider(Qt.Horizontal)
-        self.audioSlider.setRange(0,0)
-
-        self.volumeDownBtn = QPushButton('-',clicked=self.volumeDown)
-        self.volumeUpBtn = QPushButton('+', clicked=self.volumeUp)
+        self._menuBar()
 
 
-        hbox =  QHBoxLayout() #umisti tlacitka, slidery,... do UI
-        hbox.setContentsMargins(0,0,0,0)
-        hbox.addWidget(self.openFileBtn)
-        hbox.addWidget(self.playBtn)
-        hbox.addWidget(self.slider)
 
-        hbox.addWidget(self.audioSlider)
-        hbox.addWidget(self.volumeDownBtn)
-        hbox.addWidget(self.volumeUpBtn)
+    #def createControls(self):
 
-        vbox = QVBoxLayout()
-        vbox.addWidget(videowidget)
-        vbox.addLayout(hbox)
-        self.mediaPlayer.setVideoOutput(videowidget)
-        self.setLayout(vbox)
+    def _menuBar(self):
+        self.menuBar = self.menuBar()
 
-        self.mediaPlayer.stateChanged.connect(self.mediastate_changed)
-        self.mediaPlayer.positionChanged.connect(self.position_changed)
-        self.mediaPlayer.durationChanged.connect(self.duration_changed)
+        open = self.menuBar.addMenu('Soubor')
+        open_act = QAction('Otevřít...', self)
+        open_act.setShortcut('Ctrl+O')
+        open_act.triggered.connect(lambda:self.open_file())
+        open.addAction(open_act)
 
-    def volumeDown(self):
-        currentVolume = self.mediaPlayer.volume()
-        print(currentVolume)
-        self.mediaPlayer.setVolume(currentVolume - 5)
 
-    def volumeUp(self):
-            currentVolume = self.mediaPlayer.volume()
-            print(currentVolume)
-            self.mediaPlayer.setVolume(currentVolume + 5)
+        history = self.menuBar.addMenu('Historie')
+
+        history_act = QAction('Otevřít Historii', self)
+        history.addAction(history_act)
+
+        historyClr_act = QAction('Promaž Historii', self)
+        history.addAction(historyClr_act)
+
+
+        about = self.menuBar.addMenu('Autor')
+        about_act = QAction('O autorovi...', self)
+
+        about.addAction(about_act)
 
     def open_file(self):
         filename, _ = QFileDialog.getOpenFileName(self, "Open Video")
@@ -87,38 +55,23 @@ class Window(QWidget):
         if filename != '':
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(filename)))
             self.playBtn.setEnabled(True)
-            self.showMaximized()
             self.mediaPlayer.play()
 
-        mime = magic.Magic(mime=True) #check zda je soubor video
+        mime = magic.Magic(mime=True)  # check zda je soubor video
         videocheck = mime.from_file(filename)
 
         if videocheck.find('video') != -1:
             print('it is video')
+            self.showMaximized()
+    #def playVideo(self):
 
-    def play_video(self):
-        if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
-            self.mediaPlayer.pause()
+    #def playAudio(self):
 
-        else:
-            self.mediaPlayer.play()
 
-    def mediastate_changed(self, state):
-        if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
-            self.playBtn.setIcon(self.style().standardIcon(QStyle.SP_MediaPause))
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
 
-        else:
-            self.playBtn.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+    qwin = QueueWin()
+    qwin.show()
 
-    def position_changed(self, position):
-        self.slider.setValue(position)
-
-    def duration_changed(self,duration):
-        self.slider.setRange(0, duration)
-
-app = QApplication(sys.argv) #vytvori PyQt5 aplikaci
-window = Window()  #vytvori okno
-window.show()
-sys.exit(app.exec()) #nastartuje aplikaci
-#28 31
-#https://www.youtube.com/watch?v=45sPjuPJ3vs&list=WL&index=5&t=1053s
+    sys.exit(app.exec_())
