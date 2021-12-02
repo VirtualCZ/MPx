@@ -1,53 +1,41 @@
 import sys
+
 import magic
-#bude obsahovat menu (File, Edit, About,...), Queue, v menu bude historie
-from PyQt5.QtCore import QUrl
+# bude obsahovat menu (File, Edit, About,...), Queue, v menu bude historie
+from PyQt5.QtCore import QUrl, Qt
 from PyQt5.QtGui import QPalette, QColor, QIcon
-from PyQt5.QtMultimedia import QMediaContent
-from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog
+from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
+from PyQt5.QtMultimediaWidgets import QVideoWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QWidget, QLabel, QVBoxLayout, QHBoxLayout, \
+    QPushButton, QStyle, QSlider
+from ui import UI
 
+class QueueWin(QMainWindow, UI):
+    def __init__(self, *args, **kwargs):
+        super(QueueWin, self).__init__(*args, **kwargs)
+        self.ui(self)
 
-class QueueWin(QMainWindow):
-    def __init__(self):
-        QMainWindow.__init__(self)
         self.setWindowTitle('MPx')  # nastavi title
         self.setWindowIcon(QIcon('media-player-5.ico'))  # nastavi ikonku
-        self.setGeometry(710, 290, 500, 500) #xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
-        self.setMinimumSize(400, 400) # xMinimalniVelikost, yMinimalniVelikost
 
         p = self.palette()
         p.setColor(QPalette.Window, QColor(52, 51, 51))  # nastavi barvu okna
         self.setPalette(p)  # aplikuje barvu
 
-        self._menuBar()
+        self.open_file_act.triggered.connect(self.open_file)
 
+
+        self.show()
 
 
     #def createControls(self):
 
-    def _menuBar(self):
-        self.menuBar = self.menuBar()
-
-        open = self.menuBar.addMenu('Soubor')
-        open_act = QAction('Otevřít...', self)
-        open_act.setShortcut('Ctrl+O')
-        open_act.triggered.connect(lambda:self.open_file())
-        open.addAction(open_act)
+    #def _menuBar(self):
 
 
-        history = self.menuBar.addMenu('Historie')
-
-        history_act = QAction('Otevřít Historii', self)
-        history.addAction(history_act)
-
-        historyClr_act = QAction('Promaž Historii', self)
-        history.addAction(historyClr_act)
-
-
-        about = self.menuBar.addMenu('Autor')
-        about_act = QAction('O autorovi...', self)
-
-        about.addAction(about_act)
+    def credits(self):
+        w = Credits(self)
+        w.show()
 
     def open_file(self):
         filename, _ = QFileDialog.getOpenFileName(self, "Open Video")
@@ -56,22 +44,55 @@ class QueueWin(QMainWindow):
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(filename)))
             self.playBtn.setEnabled(True)
             self.mediaPlayer.play()
+            mime = magic.Magic(mime=True)  # check zda je soubor video
+            videocheck = mime.from_file(filename)
 
-        mime = magic.Magic(mime=True)  # check zda je soubor video
-        videocheck = mime.from_file(filename)
+            if videocheck.find('video') != -1:
+                print('it is video')
+                self.showMaximized()
 
-        if videocheck.find('video') != -1:
-            print('it is video')
-            self.showMaximized()
-    #def playVideo(self):
 
-    #def playAudio(self):
+class VideoWindow(QWidget):
+    def __init__(self, parent=None):
+        super(VideoWindow, self).__init__(parent)
+        self.setWindowTitle('Video') #nastavi title
+        self.setWindowIcon(QIcon('media-player-5.ico')) #nastavi ikonku
+        # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
+        self.setGeometry(710, 290, 500, 500) #xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
+        self.setMinimumSize(400, 400) # xMinimalniVelikost, yMinimalniVelikost
+
+        p = self.palette()
+        p.setColor(QPalette.Window, QColor(52, 51, 51)) #nastavi barvu okna
+        self.setPalette(p) #aplikuje barvu
+        self.prehravac()
+        self.show()
+
+    def prehravac(self):
+        self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
+        videowidget = QVideoWidget()
+
+#class History
+
+class Credits(QMainWindow):
+    def __init__(self, parent=None):
+        super(Credits, self).__init__(parent)
+        self.setWindowTitle('Credits')  # nastavi title
+        self.setWindowIcon(QIcon('media-player-5.ico'))  # nastavi ikonku
+        # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
+        self.setGeometry(710, 290, 500, 200)  # xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
+        self.setMinimumSize(200, 200)  # xMinimalniVelikost, yMinimalniVelikost
+
+        p = self.palette()
+        p.setColor(QPalette.Window, QColor(52, 51, 51))  # nastavi barvu okna
+        self.setPalette(p)  # aplikuje barvu
+
+        self.label = QLabel('Autor: Tomáš Gabriel, 3.B OAUH<br>Napsáno pomocí Pythonu a PyQt5', self)
+        self.label.setStyleSheet("color: yellow")
+        self.label.adjustSize()
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-
-    qwin = QueueWin()
-    qwin.show()
-
+    mainWin = QueueWin()
+    mainWin.show()
     sys.exit(app.exec_())

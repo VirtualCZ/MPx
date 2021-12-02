@@ -86,12 +86,12 @@ class Window(QWidget):
             self.playBtn.setEnabled(True)
             self.mediaPlayer.play()
 
-        mime = magic.Magic(mime=True) #check zda je soubor video
-        videocheck = mime.from_file(filename)
+            mime = magic.Magic(mime=True)  # check zda je soubor video
+            videocheck = mime.from_file(filename)
 
-        if videocheck.find('video') != -1:
-            print('it is video')
-            self.showMaximized()
+            if videocheck.find('video') != -1:
+                print('it is video')
+                self.showMaximized()
 
     def play_video(self):
         if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
