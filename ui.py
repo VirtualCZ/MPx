@@ -10,7 +10,7 @@ class UI(object):
         QueueWin.setObjectName("QueueWin")
         QueueWin.resize(600, 500)
         _translate = QtCore.QCoreApplication.translate
-
+        self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.centralWidget = QtWidgets.QWidget(QueueWin)
         #sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         #sizePolicy.setHorizontalStretch(0)
@@ -18,25 +18,22 @@ class UI(object):
         #sizePolicy.setHeightForWidth(self.centralWidget.sizePolicy().hasHeightForWidth())
         #self.centralWidget.setSizePolicy(sizePolicy)
 
-        self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
-        videowidget = QVideoWidget()
+
 
         self.openFileBtn = QPushButton("Otevrit soubor...", self.centralWidget)
-        #self.openFileBtn.clicked.connect(self.open_file)
+        self.openFileBtn.clicked.connect(self.open_file)
 
         self.playBtn = QPushButton(self.centralWidget)  # vytvori tlacitko "play"
         self.playBtn.setEnabled(False)
         self.playBtn.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
-        #self.playBtn.clicked.connect(self.play_video)
+        self.playBtn.clicked.connect(self.play_video)
 
         self.slider = QSlider(Qt.Horizontal, self.centralWidget)  # vytvori slider
         self.slider.setRange(0, 0)
-        self.slider.valueChanged.connect(self.mediaPlayer.setPosition)
 
         self.audioSlider = QSlider(Qt.Horizontal, self.centralWidget)
         self.audioSlider.setMaximum(100)
         self.audioSlider.setProperty("value", 100)
-        self.audioSlider.valueChanged.connect(self.mediaPlayer.setVolume)
 
         QueueWin.setCentralWidget(self.centralWidget)
 
@@ -57,9 +54,9 @@ class UI(object):
         self.vbox.addLayout(self.hbox)
         #self.mediaPlayer.setVideoOutput(videowidget)
 
-        #self.mediaPlayer.stateChanged.connect(self.mediastate_changed)
         #self.mediaPlayer.positionChanged.connect(self.update_position)
         #self.mediaPlayer.durationChanged.connect(self.duration_changed)
+
 
         self.menuBar = QMenuBar(QueueWin)
         QueueWin.setMenuBar(self.menuBar)
@@ -68,26 +65,20 @@ class UI(object):
         self.open_file_act = QtWidgets.QAction(QueueWin)
         self.open.addAction(self.open_file_act)
         self.open_file_act.setText(_translate("QueueWin", "Otevřít..."))
-
         self.menuBar.addAction(self.open.menuAction())
         self.open.setTitle(_translate("QueueWin", "Soubor"))
-        #open = self.menuBar.addMenu('Soubor')
-        #open_act = QAction('Otevřít...', self)
-        #open_act.setShortcut('Ctrl+O')
-        #open_act.triggered.connect(lambda: self.open_file())
-        #open.addAction(open_act)
 
-        #history = self.menuBar.addMenu('Historie')
+        self.history = QtWidgets.QMenu(self.menuBar)
+        self.history_act = QtWidgets.QAction(QueueWin)
+        self.history.addAction(self.history_act)
+        self.history_act.setText(_translate("QueueWin", "Otevřít historii"))
+        self.menuBar.addAction(self.history.menuAction())
+        self.history.setTitle(_translate("QueueWin", "Historie"))
 
-        #history_act = QAction('Otevřít Historii', self)
-        #history_act.setShortcut('Ctrl+H')
-        #open_act.triggered.connect(lambda:self.open_history())
-        #history.addAction(history_act)
-
-        #historyClr_act = QAction('Promaž Historii', self)
-        #historyClr_act.setShortcut('ALT+H')
-        #open_act.triggered.connect(lambda:self.clr_history())
-        #history.addAction(historyClr_act)
+        self.historyClr_act = QtWidgets.QAction(QueueWin)
+        self.history.addAction(self.historyClr_act)
+        self.historyClr_act.setText(_translate("QueueWin", "Vymazat historii"))
+        self.historyClr_act.setShortcut('ALT+H')
 
         #about = self.menuBar.addMenu('Autor')
         #about_act = QAction('O autorovi...', self)
@@ -95,5 +86,18 @@ class UI(object):
         #about_act.triggered.connect(lambda: self.credits())
         #about.addAction(about_act)
 
-
         QtCore.QMetaObject.connectSlotsByName(QueueWin)
+
+    def videoui(self, VideoWindow):
+        VideoWindow.setObjectName("QueueWin")
+        VideoWindow.resize(600, 500)
+        self.centralWidget = QtWidgets.QWidget(VideoWindow)
+        self.videowidget = QVideoWidget(self.centralWidget)
+        VideoWindow.setCentralWidget(self.centralWidget)
+        self.hbox = QHBoxLayout(self.centralWidget)  # umisti tlacitka, slidery,... do UI
+        self.hbox.setContentsMargins(11, 11, 11, 11)
+        self.hbox.addWidget(self.videowidget)
+        self.vbox = QVBoxLayout(self.centralWidget)
+        self.vbox.addLayout(self.hbox)
+
+        QtCore.QMetaObject.connectSlotsByName(VideoWindow)
