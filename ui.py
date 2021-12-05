@@ -2,23 +2,17 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
-from PyQt5.QtWidgets import QPushButton, QSlider, QStyle, QHBoxLayout, QVBoxLayout, QMenuBar
+from PyQt5.QtWidgets import QPushButton, QSlider, QStyle, QHBoxLayout, QVBoxLayout, QMenuBar, QListView
 
 
 class UI(object):
     def ui(self, QueueWin):
         QueueWin.setObjectName("QueueWin")
         QueueWin.resize(600, 500)
+
         _translate = QtCore.QCoreApplication.translate
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.centralWidget = QtWidgets.QWidget(QueueWin)
-        #sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
-        #sizePolicy.setHorizontalStretch(0)
-        #sizePolicy.setVerticalStretch(0)
-        #sizePolicy.setHeightForWidth(self.centralWidget.sizePolicy().hasHeightForWidth())
-        #self.centralWidget.setSizePolicy(sizePolicy)
-
-
 
         self.openFileBtn = QPushButton("Otevrit soubor...", self.centralWidget)
         self.openFileBtn.clicked.connect(self.open_file)
@@ -37,11 +31,11 @@ class UI(object):
 
         QueueWin.setCentralWidget(self.centralWidget)
 
-        # self.queue = QListView(self)
-        # self.queue.setAcceptDrops(True)
-        # self.queue.setAlternatingRowColors(True)
+        self.playlistV = QListView(self)
+        self.playlistV.setAlternatingRowColors(True)
+        self.playlistV.setUniformItemSizes(True)
 
-        self.hbox = QHBoxLayout(self.centralWidget)  # umisti tlacitka, slidery,... do UI
+        self.hbox = QHBoxLayout()  # umisti tlacitka, slidery,... do UI
         self.hbox.setContentsMargins(11, 11, 11, 11)
         self.hbox.addWidget(self.openFileBtn)
         self.hbox.addWidget(self.playBtn)
@@ -49,14 +43,9 @@ class UI(object):
         self.hbox.addWidget(self.audioSlider)
 
         self.vbox = QVBoxLayout(self.centralWidget)
-        #self.vbox.addWidget(videowidget)
-        # vbox.addWidget(self.queue)
+        self.vbox.setSpacing(6)
+        self.vbox.addWidget(self.playlistV)
         self.vbox.addLayout(self.hbox)
-        #self.mediaPlayer.setVideoOutput(videowidget)
-
-        #self.mediaPlayer.positionChanged.connect(self.update_position)
-        #self.mediaPlayer.durationChanged.connect(self.duration_changed)
-
 
         self.menuBar = QMenuBar(QueueWin)
         QueueWin.setMenuBar(self.menuBar)
@@ -80,11 +69,7 @@ class UI(object):
         self.historyClr_act.setText(_translate("QueueWin", "Vymazat historii"))
         self.historyClr_act.setShortcut('ALT+H')
 
-        #about = self.menuBar.addMenu('Autor')
-        #about_act = QAction('O autorovi...', self)
         #about_act.setShortcut('CTRL+A')
-        #about_act.triggered.connect(lambda: self.credits())
-        #about.addAction(about_act)
 
         QtCore.QMetaObject.connectSlotsByName(QueueWin)
 

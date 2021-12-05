@@ -1,6 +1,6 @@
 import sys
 # bude obsahovat menu (File, Edit, About,...), Queue, v menu bude historie
-from PyQt5.QtCore import QUrl, Qt
+from PyQt5.QtCore import QUrl, Qt, QAbstractListModel
 from PyQt5.QtGui import QPalette, QColor, QIcon
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer, QMediaPlaylist
 from PyQt5.QtMultimediaWidgets import QVideoWidget
@@ -13,6 +13,19 @@ from ui import UI
 #veci co budu asi chtit
 #https://stackoverflow.com/questions/70227921/pyqt-5-i-need-to-make-a-new-window-with-video-output-qmediaplayer?noredirect=1#comment124143967_70227921
 #https://www.pythonguis.com/tutorials/creating-multiple-windows/
+class Model(QAbstractListModel):
+    def __init__(self, playlist, *args, **kwargs):
+        super(Model, self).__init__(*args, **kwargs)
+        self.playlist = playlist
+
+    def data(self, index, role):
+        if role == Qt.DisplayRole:
+            media = self.playlist.media(index.row())
+            return media.canonicalUrl().fileName()
+
+    def rowCount(self, index):
+        return self.playlist.mediaCount()
+
 class QueueWin(QMainWindow, UI):
     def __init__(self, *args, **kwargs):
         super(QueueWin, self).__init__(*args, **kwargs)
@@ -20,12 +33,20 @@ class QueueWin(QMainWindow, UI):
         self.playlist = QMediaPlaylist()
         self.mediaPlayer.setPlaylist(self.playlist)
 
+        self.mediaPlayer.error.connect(self.error)
+
         self.setWindowTitle('MPx')  # nastavi title
         self.setWindowIcon(QIcon('media-player-5.ico'))  # nastavi ikonku
 
         p = self.palette()
         p.setColor(QPalette.Window, QColor(52, 51, 51))  # nastavi barvu okna
         self.setPalette(p)  # aplikuje barvu
+
+        self.model = Model(self.playlist)
+        self.playlistV.setModel(self.model)
+        self.playlist.currentIndexChanged.connect(self.playlist_position_changed)
+        selection_model = self.playlistV.selectionModel()
+        selection_model.selectionChanged.connect(self.playlist_selection_changed)
 
         self.open_file_act.triggered.connect(self.open_file)
         #self.history_act.triggered.connect(self.open_history)
@@ -53,11 +74,19 @@ class QueueWin(QMainWindow, UI):
         w.show()
 
     def open_file(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "Open Video")
-        if filename != '':
-            self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(filename)))
-            self.playBtn.setEnabled(True)
-            self.mediaPlayer.play()
+        filepath, _ = QFileDialog.getOpenFileName(self, "Open File")
+
+        if filepath:
+            self.playlist.addMedia(
+                QMediaContent(
+                    QUrl.fromLocalFile(filepath)
+                )
+            )
+
+            self.model.layoutChanged.emit()
+            #self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(filename)))
+            #self.playBtn.setEnabled(True)
+            #self.mediaPlayer.play()
 
     def videoAvailableChanged(self, available):
         videoWindow = VideoWindow(self)
@@ -91,6 +120,19 @@ class QueueWin(QMainWindow, UI):
 
         else:
             self.playBtn.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
+
+    def playlist_selection_changed(self, ix):
+        # Dostanu QItemSelection z selectionChanged.
+        i = ix.indexes()[0].row()
+        self.playlist.setCurrentIndex(i)
+
+    def playlist_position_changed(self, i):
+        if i > -1:
+            ix = self.model.index(i)
+            self.playlistV.setCurrentIndex(ix)
+
+    def error(self, *args):
+        print(args)
 
 class VideoWindow(QMainWindow, UI):
     def __init__(self, *args, **kwargs):
