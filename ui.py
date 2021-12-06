@@ -14,11 +14,8 @@ class UI(object):
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
         self.centralWidget = QtWidgets.QWidget(QueueWin)
 
-        self.openFileBtn = QPushButton("Otevrit soubor...", self.centralWidget)
-        self.openFileBtn.clicked.connect(self.open_file)
-
         self.playBtn = QPushButton(self.centralWidget)  # vytvori tlacitko "play"
-        self.playBtn.setEnabled(False)
+        self.playBtn.setEnabled(True)
         self.playBtn.setIcon(self.style().standardIcon(QStyle.SP_MediaPlay))
         self.playBtn.clicked.connect(self.play_video)
 
@@ -34,10 +31,10 @@ class UI(object):
         self.playlistV = QListView(self)
         self.playlistV.setAlternatingRowColors(True)
         self.playlistV.setUniformItemSizes(True)
+        self.playlistV.setStyleSheet("alternate-background-color: #2f796c;background-color: #1f3f42; color: #ededed;")
 
         self.hbox = QHBoxLayout()  # umisti tlacitka, slidery,... do UI
         self.hbox.setContentsMargins(11, 11, 11, 11)
-        self.hbox.addWidget(self.openFileBtn)
         self.hbox.addWidget(self.playBtn)
         self.hbox.addWidget(self.slider)
         self.hbox.addWidget(self.audioSlider)
@@ -50,32 +47,59 @@ class UI(object):
         self.menuBar = QMenuBar(QueueWin)
         QueueWin.setMenuBar(self.menuBar)
 
+        self.setStyleSheet("""
+                QMenuBar {
+                    background-color: rgb(1,97,99);
+                    color: rgb(255,255,255);
+                }
+
+                QMenuBar::item {
+                    background-color: rgb(1,97,99 );
+                    color: rgb(255,255,255);
+                }
+
+                QMenuBar::item::selected {
+                    background-color: rgb(70,133,136 );
+                }
+
+                QMenu {
+                    background-color: rgb(31,63,66);
+                    color: rgb(255,255,255);   
+                }
+
+                QMenu::item::selected {
+                    background-color: rgb(41,73,76);
+                }
+            """)
+
+
+
         self.open = QtWidgets.QMenu(self.menuBar)
         self.open_file_act = QtWidgets.QAction(QueueWin)
         self.open.addAction(self.open_file_act)
         self.open_file_act.setText(_translate("QueueWin", "Otevřít..."))
         self.menuBar.addAction(self.open.menuAction())
+        self.open_file_act.setShortcut('CTRL+A')
         self.open.setTitle(_translate("QueueWin", "Soubor"))
 
-        self.history = QtWidgets.QMenu(self.menuBar)
-        self.history_act = QtWidgets.QAction(QueueWin)
-        self.history.addAction(self.history_act)
-        self.history_act.setText(_translate("QueueWin", "Otevřít historii"))
-        self.menuBar.addAction(self.history.menuAction())
-        self.history.setTitle(_translate("QueueWin", "Historie"))
+        self.open_video_act = QtWidgets.QAction(QueueWin)
+        self.open.addAction(self.open_video_act)
+        self.open_video_act.setText(_translate("QueueWin", "Videopop"))
+        self.open_video_act.setShortcut('CTRL+V')
 
-        self.historyClr_act = QtWidgets.QAction(QueueWin)
-        self.history.addAction(self.historyClr_act)
-        self.historyClr_act.setText(_translate("QueueWin", "Vymazat historii"))
-        self.historyClr_act.setShortcut('ALT+H')
-
-        #about_act.setShortcut('CTRL+A')
+        self.credits = QtWidgets.QMenu(self.menuBar)
+        self.credits_act = QtWidgets.QAction(QueueWin)
+        self.credits.addAction(self.credits_act)
+        self.credits_act.setText(_translate("QueueWin", "O autorovi"))
+        self.menuBar.addAction(self.credits.menuAction())
+        self.credits.setTitle(_translate("QueueWin", "About"))
+        self.credits_act.setShortcut('CTRL+O')
 
         QtCore.QMetaObject.connectSlotsByName(QueueWin)
 
     def videoui(self, VideoWindow):
         VideoWindow.setObjectName("QueueWin")
-        VideoWindow.resize(600, 500)
+        VideoWindow.resize(1280, 720)
         self.centralWidget = QtWidgets.QWidget(VideoWindow)
         self.videowidget = QVideoWidget(self.centralWidget)
         VideoWindow.setCentralWidget(self.centralWidget)
@@ -86,3 +110,4 @@ class UI(object):
         self.vbox.addLayout(self.hbox)
 
         QtCore.QMetaObject.connectSlotsByName(VideoWindow)
+

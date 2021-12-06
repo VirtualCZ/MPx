@@ -8,11 +8,14 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QWi
     QPushButton, QStyle, QSlider
 from ui import UI
 # do dokumentace:
-#kontrola videa https://python.hotexamples.com/examples/PyQt5.QtMultimedia/QMediaPlayer/state/python-qmediaplayer-state-method-examples.html
+#kontrola videa -  https://python.hotexamples.com/examples/PyQt5.QtMultimedia/QMediaPlayer/state/python-qmediaplayer-state-method-examples.html
+#paleta - https://stitchpalettes.com/palette/northern-lights-spa0226/
+
 
 #veci co budu asi chtit
 #https://stackoverflow.com/questions/70227921/pyqt-5-i-need-to-make-a-new-window-with-video-output-qmediaplayer?noredirect=1#comment124143967_70227921
 #https://www.pythonguis.com/tutorials/creating-multiple-windows/
+#https://icons8.com/icon/set/media-controls/material-rounded
 class Model(QAbstractListModel):
     def __init__(self, playlist, *args, **kwargs):
         super(Model, self).__init__(*args, **kwargs)
@@ -39,7 +42,7 @@ class QueueWin(QMainWindow, UI):
         self.setWindowIcon(QIcon('media-player-5.ico'))  # nastavi ikonku
 
         p = self.palette()
-        p.setColor(QPalette.Window, QColor(52, 51, 51))  # nastavi barvu okna
+        p.setColor(QPalette.Window, QColor(1,97,99 ))  # nastavi barvu okna
         self.setPalette(p)  # aplikuje barvu
 
         self.model = Model(self.playlist)
@@ -50,8 +53,10 @@ class QueueWin(QMainWindow, UI):
 
         self.open_file_act.triggered.connect(self.open_file)
         #self.history_act.triggered.connect(self.open_history)
-        self.history_act.triggered.connect(self.videopop)
-        #self.open_act.triggered.connect(self.clr_history)
+        self.open_video_act.triggered.connect(self.videopop)
+        self.credits_act.triggered.connect(self.creditsd)
+       # self.open_player_act.triggered.connect(self.videopop)
+
 
         self.mediaPlayer.stateChanged.connect(self.mediastate_changed) #mení ikonku na tlačítku play
         self.mediaPlayer.positionChanged.connect(self.update_position)
@@ -61,15 +66,11 @@ class QueueWin(QMainWindow, UI):
         self.slider.valueChanged.connect(self.mediaPlayer.setPosition)
         self.audioSlider.valueChanged.connect(self.mediaPlayer.setVolume)
 
-    def open_history (self):
-        h = History(self)
-        h.show()
-
     def videopop(self):
         v = VideoWindow(self)
         v.show()
 
-    def credits(self):
+    def creditsd(self):
         w = Credits(self)
         w.show()
 
@@ -84,8 +85,6 @@ class QueueWin(QMainWindow, UI):
             )
 
             self.model.layoutChanged.emit()
-            #self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(filename)))
-            #self.playBtn.setEnabled(True)
             #self.mediaPlayer.play()
 
     def videoAvailableChanged(self, available):
@@ -141,24 +140,10 @@ class VideoWindow(QMainWindow, UI):
         self.setWindowTitle('Video') #nastavi title
         self.setWindowIcon(QIcon('media-player-5.ico')) #nastavi ikonku
         # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
-        self.setGeometry(710, 290, 500, 500) #xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
         self.setMinimumSize(400, 400) # xMinimalniVelikost, yMinimalniVelikost
         p = self.palette()
         p.setColor(QPalette.Window, QColor(52, 51, 51)) #nastavi barvu okna
         self.setPalette(p) #aplikuje barvu
-
-class History(QMainWindow):
-    def __init__(self, parent=None):
-        super(History, self).__init__(parent)
-        self.setWindowTitle('Historie')  # nastavi title
-        self.setWindowIcon(QIcon('media-player-5.ico'))  # nastavi ikonku
-        # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
-        self.setGeometry(710, 290, 500, 200)  # xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
-        self.setMinimumSize(200, 200)  # xMinimalniVelikost, yMinimalniVelikost
-
-        p = self.palette()
-        p.setColor(QPalette.Window, QColor(52, 51, 51))  # nastavi barvu okna
-        self.setPalette(p)  # aplikuje barvu
 
 class Credits(QMainWindow):
     def __init__(self, parent=None):
@@ -170,11 +155,12 @@ class Credits(QMainWindow):
         self.setMinimumSize(200, 200)  # xMinimalniVelikost, yMinimalniVelikost
 
         p = self.palette()
-        p.setColor(QPalette.Window, QColor(52, 51, 51))  # nastavi barvu okna
+        p.setColor(QPalette.Window, QColor(31,63,66))  # nastavi barvu okna
         self.setPalette(p)  # aplikuje barvu
 
-        self.label = QLabel('Autor: Tomáš Gabriel, 3.B OAUH<br>Napsáno pomocí Pythonu a PyQt5', self)
-        self.label.setStyleSheet("color: yellow")
+        self.label = QLabel('Autor: Tomáš Gabriel, 3.B OAUH<br>Napsáno pomocí Pythonu a PyQt5<br><a href="https://icons8.com">Icons</a>', self)
+        self.label.setOpenExternalLinks(True)
+        self.label.setStyleSheet("color: #ededed")
         self.label.adjustSize()
 
 
