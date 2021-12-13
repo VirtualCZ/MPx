@@ -71,8 +71,8 @@ class UI(object):
                     background-color: rgb(41,73,76);
                 }
             """)
-
-
+        #https://stackoverflow.com/questions/54524274/how-do-i-change-the-color-of-the-text-in-a-menu-bar-item-in-pyqt5
+        #https://stitchpalettes.com/palette/northern-lights-spa0226/
 
         self.open = QtWidgets.QMenu(self.menuBar)
         self.open_file_act = QtWidgets.QAction(QueueWin)
