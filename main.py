@@ -33,6 +33,7 @@ class QueueWin(QMainWindow, UI):
     def __init__(self, *args, **kwargs):
         super(QueueWin, self).__init__(*args, **kwargs)
         self.ui(self)
+        self.v = None
         self.playlist = QMediaPlaylist()
         self.mediaPlayer.setPlaylist(self.playlist)
 
@@ -67,8 +68,11 @@ class QueueWin(QMainWindow, UI):
         self.audioSlider.valueChanged.connect(self.mediaPlayer.setVolume)
 
     def videopop(self):
-        v = VideoWindow(self)
-        v.show()
+        if self.v is None:
+            self.v = VideoWindow(self)
+        self.mediaPlayer.setVideoOutput(self.v.videowidget)
+        self.v.show()
+        self.v.activateWindow()
 
     def creditsd(self):
         w = Credits(self)
@@ -91,8 +95,7 @@ class QueueWin(QMainWindow, UI):
         videoWindow = VideoWindow(self)
         if available:
             print('Video')
-            self.mediaPlayer.setVideoOutput(videoWindow.videowidget)
-            videoWindow.show()
+            self.videopop()
 #bylo by fajn to okno pak zavrit
 
     def position_changed(self, position):
@@ -124,18 +127,20 @@ class QueueWin(QMainWindow, UI):
         # Dostanu QItemSelection z selectionChanged.
         i = ix.indexes()[0].row()
         self.playlist.setCurrentIndex(i)
+        self.mediaPlayer.play()
 
     def playlist_position_changed(self, i):
         if i > -1:
             ix = self.model.index(i)
             self.playlistV.setCurrentIndex(ix)
+            self.mediaPlayer.play()
 
     def error(self, *args):
         print(args)
 
 class VideoWindow(QMainWindow, UI):
     def __init__(self, *args, **kwargs):
-        super(VideoWindow, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.videoui(self)
         self.setWindowTitle('Video') #nastavi title
         self.setWindowIcon(QIcon('media-player-5.ico')) #nastavi ikonku
