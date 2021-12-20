@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5.QtCore import QUrl, Qt, QAbstractListModel
-from PyQt5.QtGui import QPalette, QColor, QIcon
+from PyQt5.QtGui import QPalette, QColor, QIcon, QFont
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer, QMediaPlaylist
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QLabel, QStyle
 
@@ -135,7 +135,6 @@ class QueueWin(QMainWindow, UI):
 class VideoWindow(QMainWindow, UI):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.setWindowTitle('Video')  # nastavi title
         self.setWindowIcon(QIcon('media-player-5.ico'))  # nastavi ikonku
         # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
@@ -150,16 +149,17 @@ class Credits(QMainWindow):
         self.setWindowTitle('O programu')  # nastavi title
         self.setWindowIcon(QIcon('media-player-5.ico'))  # nastavi ikonku
         # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
-        self.setGeometry(1280, 720)  # xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
+        self.setGeometry(710, 290, 500, 200)  # xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
         self.setMinimumSize(200, 200)  # xMinimalniVelikost, yMinimalniVelikost
 
         p = self.palette()
         p.setColor(QPalette.Window, QColor(31, 63, 66))  # nastavi barvu okna
         self.setPalette(p)  # aplikuje barvu
 
-        self.label = QLabel('Autor: Tomáš Gabriel, 3.B OAUH<br>Napsáno pomocí Pythonu a PyQt5<br><a href="https://icons8.com">Icons</a>', self)
+        self.label = QLabel('Autor: Tomáš Gabriel, 3.B OAUH<br>Napsáno pomocí Pythonu a PyQt5', self)
         self.label.setOpenExternalLinks(True)
         self.label.setStyleSheet("color: #ededed")
+        self.label.setFont(QFont('Times', 10))
         self.label.adjustSize()
 
 
