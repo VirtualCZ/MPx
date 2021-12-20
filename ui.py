@@ -4,7 +4,6 @@ from PyQt5.QtMultimedia import QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtWidgets import QPushButton, QSlider, QStyle, QHBoxLayout, QVBoxLayout, QMenuBar, QListView
 
-
 class UI(object):
     def ui(self, QueueWin):
         QueueWin.setObjectName("QueueWin")
@@ -98,14 +97,16 @@ class UI(object):
         QtCore.QMetaObject.connectSlotsByName(QueueWin)
 
     def videoui(self, VideoWindow):
-        VideoWindow.setObjectName("QueueWin")
         VideoWindow.resize(1280, 720)
         self.centralWidget = QtWidgets.QWidget(VideoWindow)
+
         self.videowidget = QVideoWidget(self.centralWidget)
         VideoWindow.setCentralWidget(self.centralWidget)
-        self.hbox = QHBoxLayout(self.centralWidget)  # umisti tlacitka, slidery,... do UI
+
+        self.hbox = QHBoxLayout()  # umisti tlacitka, slidery,... do UI
         self.hbox.setContentsMargins(11, 11, 11, 11)
         self.hbox.addWidget(self.videowidget)
+
         self.vbox = QVBoxLayout(self.centralWidget)
         self.vbox.addLayout(self.hbox)
 

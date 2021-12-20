@@ -1,18 +1,11 @@
 import sys
 
-# bude obsahovat menu (File, Edit, About,...), Queue, v menu bude historie
 from PyQt5.QtCore import QUrl, Qt, QAbstractListModel
 from PyQt5.QtGui import QPalette, QColor, QIcon
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer, QMediaPlaylist
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QLabel, QStyle
 
 from ui import UI
-
-
-# do dokumentace:
-# kontrola videa -  https://python.hotexamples.com/examples/PyQt5.QtMultimedia/QMediaPlayer/state/python-qmediaplayer-state-method-examples.html
-# paleta - https://stitchpalettes.com/palette/northern-lights-spa0226/
-
 
 # veci co budu asi chtit
 # https://stackoverflow.com/questions/70227921/pyqt-5-i-need-to-make-a-new-window-with-video-output-qmediaplayer?noredirect=1#comment124143967_70227921
@@ -74,6 +67,7 @@ class QueueWin(QMainWindow, UI):
     def videopop(self):
         if self.v is None:
             self.v = VideoWindow(self)
+        self.v.videoui(self.v)
         self.mediaPlayer.setVideoOutput(self.v.videowidget)
         self.v.show()
         self.v.activateWindow()
@@ -141,7 +135,7 @@ class QueueWin(QMainWindow, UI):
 class VideoWindow(QMainWindow, UI):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.videoui(self)
+
         self.setWindowTitle('Video')  # nastavi title
         self.setWindowIcon(QIcon('media-player-5.ico'))  # nastavi ikonku
         # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
@@ -156,7 +150,7 @@ class Credits(QMainWindow):
         self.setWindowTitle('O programu')  # nastavi title
         self.setWindowIcon(QIcon('media-player-5.ico'))  # nastavi ikonku
         # http://www.iconseeker.com/search-icon/isabi/media-player-5.html   <-- odkaz na ikonku
-        self.setGeometry(710, 290, 500, 200)  # xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
+        self.setGeometry(1280, 720)  # xMistoOtevreni, yMistoOtevreni, xVelikost, yVelikost
         self.setMinimumSize(200, 200)  # xMinimalniVelikost, yMinimalniVelikost
 
         p = self.palette()
