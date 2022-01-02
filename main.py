@@ -9,7 +9,6 @@ from ui import UI
 
 # veci co budu asi chtit
 # https://stackoverflow.com/questions/70227921/pyqt-5-i-need-to-make-a-new-window-with-video-output-qmediaplayer?noredirect=1#comment124143967_70227921
-# https://www.pythonguis.com/tutorials/creating-multiple-windows/
 class Model(QAbstractListModel):
     def __init__(self, playlist, *args, **kwargs):
         super(Model, self).__init__(*args, **kwargs)
